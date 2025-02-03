@@ -1,7 +1,7 @@
 
 class Employee: # Информация о работниках
     def __init__(self, surname: str, age: int, salary: int) -> None:
-        self.surname = input(surname)
+        self.surname = surname
         self.age = age
         self.salary = salary
 
