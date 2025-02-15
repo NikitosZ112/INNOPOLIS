@@ -46,8 +46,8 @@ def merge(left, right, key):
             result.append(right.pop(0))
     return result + left + right
 
-# Функция пирамидальной сортировки
 def heapify(books, n, i, key):
+    """Пирамидальная сортировка"""
     largest = i
     left = 2 * i + 1
     right = 2 * i + 2
