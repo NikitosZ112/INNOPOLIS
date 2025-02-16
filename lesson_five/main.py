@@ -35,7 +35,6 @@ class TaskScheduler:
     def task_count(self):
         return self.task_queue.qsize()
 
-# Пример использования
 if __name__ == "__main__":
     scheduler = TaskScheduler()
 
