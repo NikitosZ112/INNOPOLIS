@@ -1,76 +1,42 @@
-# # Интерфейс команды
-class Command:
-    def execute(self): # Выполнить команду
-        pass
+# Интерфейс старого сервиса (OldService)
+class OldService:
+    def fetch_data(self): # Метод старого сервиса, возвращающий данные о расходах
+        return {"fuel_costs": [52373985, 1417389, 8193]}  # Общий, среднесуточный, на единицу
 
-    def undo(self): # Отменить команду
-        pass
+# Интерфейс нового сервиса (NewService)
+class NewService:
+    def get_data(self): # Метод нового сервиса, который должен возвращать данные в виде отчета
+        pass  # Абстрактный метод
 
-# Класс для управления светом
-class Light:
-    def on(self):
-        print("Свет включен")
-        return "Свет включен"
+# Адаптер, который преобразует OldService к NewService
+class ServiceAdapter(NewService):
+    def __init__(self, old_service): #  Конструктор адаптера принимает экземпляр старого сервиса
+        self.old_service = old_service
 
-    def off(self):
-        print("Свет выключен")
-        return "Свет выключен"
+    def get_data(self): # Преобразует данные в отчет
+        old_data = self.old_service.fetch_data()
+        # Отчет
+        report = {
+            "Общий расход": f"{old_data['fuel_costs'][0]:,} ₽",
+            "Среднесуточный расход": f"{old_data['fuel_costs'][1]:,} ₽",
+            "Среднесуточный расход на единицу": f"{old_data['fuel_costs'][2]:,} ₽",
+        }
+        return report
 
-# Команда для включения света
-class LightOnCommand(Command):
-    def __init__(self, light):
-        self.light = light
+# Клиентский код
+def client_code(service: NewService):
+    report = service.get_data()
+    print("Отчет о расходах:")
+    for key, value in report.items():
+        print(f"{key}: {value}")
 
-    def execute(self):
-        self.light.on()
-
-    def undo(self):
-        self.light.off()
-
-# Команда для выключения света
-class lightOffCommand(Command):
-    def __init__(self, light):
-        self.light = light
-
-    def execute(self):
-        self.light.off()
-
-    def undo(self):
-        self.light.on()
-
-# Класс для управления командами
-class RemoteControl:
-    def __init__(self):
-        self.history = [] # История выполненных команд
-
-    def set_command(self, command): # Выполняет команду и сохраняет ее в истории
-        command.execute()
-        self.history.append(command)
-
-    def undo_last_command(self):
-        if self.history:
-            last_command = self.history.pop()
-            last_command.undo()
-        else:
-            print("Команд для отмены нет")
-
-# Тестирование системы
+# Тестирование адаптера
 if __name__ == "__main__":
-    light_room = Light() # Обьект света
+    # Создаем экземпляр старого сервиса
+    old_service = OldService()
 
-    # Команды для управления светом
-    light_on = LightOnCommand(light_room)
-    light_off = lightOffCommand(light_room)
+    # Создаем адаптер для старого сервиса
+    adapter = ServiceAdapter(old_service)
 
-    # Создаем пульт управления
-    remote = RemoteControl()
-
-    # Управляем светом
-    remote.set_command(light_on)
-    remote.set_command(light_off)
-
-    # Отменяем последнюю команду
-    remote.undo_last_command()  # Свет включается обратно
-
-
-
+    # Клиентский код использует адаптер как новый сервис
+    client_code(adapter)
