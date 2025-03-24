@@ -35,5 +35,6 @@ def main():
     except ZeroDivisionError as e:
         print(e)
 
+
 if __name__ == "__main__":
     main()
