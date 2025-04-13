@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-ё  </component>
+    <mapping directory="$PROJECT_DIR$/certification2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/django-crm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/simple_calculator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/simple_calculator/test_test" vcs="Git" />
+  </component>
 </project>
