@@ -6,13 +6,15 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional
 from abc import ABC, abstractmethod
 
-DB_CONFIG = {
-    "user": "postgres",
-    "password": "12345",
-    "host": "127.0.0.1",
-    "port": "5432",
-    "database": "postgres"
-}
+def get_db_config():
+    print("\n=== Введите параметры подключения к PostgreSQL ===")
+    return {
+        "user": input("Пользователь: "),
+        "password": input("Пароль: "),
+        "host": input("Хост: "),
+        "port": input("Порт: "),
+        "database": input("База данных: ")
+    }
 
 @dataclass
 class Task:
@@ -63,8 +65,11 @@ class TaskQueue:
 
     async def initialize_db(self):
         try:
+            # Получаем конфигурацию БД от пользователя
+            db_config = get_db_config()
+
             # Синхронное подключение для создания таблицы
-            sync_conn = psycopg2.connect(**DB_CONFIG)
+            sync_conn = psycopg2.connect(**db_config)
             with sync_conn.cursor() as cursor:
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS tasks (
@@ -78,7 +83,7 @@ class TaskQueue:
             sync_conn.close()
 
             # Асинхронный пул соединений
-            self.db_pool = await asyncpg.create_pool(**DB_CONFIG)
+            self.db_pool = await asyncpg.create_pool(**db_config)
             await self._load_tasks_from_db()
         except Exception as e:
             print(f"Ошибка инициализации БД: {e}")
@@ -230,52 +235,3 @@ class TaskManager:
             print("Ошибка: ID задачи должен быть числом")
         except Exception as e:
             print(f"Ошибка при поиске задачи: {e}")
-
-
-async def main():
-    manager = TaskManager()
-
-    try:
-        print("Инициализация базы данных...")
-        await manager.initialize()
-        print("Подключение к БД успешно установлено")
-    except Exception as e:
-        print(f"Не удалось подключиться к БД: {e}")
-        return
-
-    while True:
-        print("\nМенеджер задач (PostgreSQL)")
-        print("1. Добавить задачу")
-        print("2. Удалить задачу")
-        print("3. Запустить все задачи")
-        print("4. Показать список задач")
-        print("5. Найти задачу по ID")
-        print("6. Выйти")
-
-        choice = input("Выберите действие: ")
-
-        try:
-            if choice == "1":
-                description = input("Введите описание задачи: ")
-                await manager.add_task(description)
-            elif choice == "2":
-                task_id = input("Введите ID задачи: ")
-                await manager.remove_task(task_id)
-            elif choice == "3":
-                await manager.run_tasks()
-            elif choice == "4":
-                manager.list_tasks()
-            elif choice == "5":
-                task_id = input("Введите ID задачи: ")
-                manager.find_task(task_id)
-            elif choice == "6":
-                print("Выход из программы")
-                break
-            else:
-                print("Неверный выбор, попробуйте снова")
-        except Exception as e:
-            print(f"Произошла ошибка: {e}")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
