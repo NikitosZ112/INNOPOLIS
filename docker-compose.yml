@@ -1,0 +1,43 @@
+version: '3.11'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  server:
+    build: ./server
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=${DB_URL}
+    networks:
+      - app-network
+
+  bot:
+    build: ./bot
+    depends_on:
+      - server
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - SERVER_URL=http://server:8000
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:

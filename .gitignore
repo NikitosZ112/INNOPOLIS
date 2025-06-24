@@ -1,0 +1,18 @@
+# Файлы окружения
+.env
+*.env
+
+# Файлы IDE
+.idea/
+.vscode/
+
+# Питон кэш
+__pycache__/
+*.py[cod]
+
+# Логи и временные файлы
+*.log
+*.tmp
+
+# Docker
+docker-compose.override.yml
